@@ -1,0 +1,49 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-toml
+        stages: [pre-commit]
+      - id: check-yaml
+        stages: [pre-commit]
+      - id: check-added-large-files
+        args: ["--maxkb=100000"] # 100 MB
+      - id: end-of-file-fixer
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+      - id: mixed-line-ending
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.0
+    hooks:
+      - id: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.2
+    hooks:
+      - id: markdownlint-cli2
+        args: [--fix]
+
+  - repo: local
+    hooks:
+      - id: commitlint
+        name: Conventional Commits (commitlint)
+        description: Enforce Conventional Commits format on the commit message.
+        language: unsupported
+        entry: npx commitlint --edit
+        stages: [commit-msg]
+
+      - id: branch-name-check
+        name: Branch naming convention
+        description: Reject pushes from branches that don't follow the naming convention.
+        language: unsupported
+        entry: bash scripts/check_branch_name.sh
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
